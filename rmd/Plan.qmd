@@ -1,0 +1,87 @@
+---
+title: "Online Odyssey Outlet"
+author: "Lebintiti Kobe"
+format: html
+---
+
+# Problem Statement 
+
+ >
+You are a junior analyst working for an e-commerce startup, Online
+Odyssey Outlet.
+>
+>
+The date is January 2020, and the startup has just been through its first winter sale.
+Senior stakeholders are interested in knowing which products performed best during
+the Christmas period so that they can streamline the products they advertise in future
+sale periods.
+>
+
+---
+
+>
+ You will do this by analyzing up to two months of events data, presented
+as two separate data sources with identical structures. Events refer not just to sales but
+to more general customer actions, such as viewing a product on the website or placing
+it into their virtual cart.
+>
+
+---
+
+>
+ The challenge is that, when pressed, stakeholders aren’t exactly sure what they
+mean by “best.” In an initial brainstorming session, they highlight some aspects they
+care about when ranking their products:
+>
+>
+-   Volume of sales
+-   Total revenue from a single product
+-   Popularity, measured by the number of unique customers who bought a product
+-   Conversion, meaning the percentage of time a product is bought once it has
+been placed in the virtual shopping cart
+-   Products with increased performance from November to December
+>
+
+
+# Results driven approach 
+
+## 1. Understanding the problem : 
+
+Senior stakeholders are interested in knowing which products performed best during the Christmas period so that they can streamline the products they advertise in future sale periods.
+
+### What are our hoping stakeholders to achieve if they advertise the best performing products : 
+
+-   To attract and retain new customers 
+-   To improve sales 
+-   To increase revenue 
+-   To increase brand awareness and presence 
+-   e.t.c
+
+
+### Therefore "best performing product over christmas period" : 
+
+-   Product that had an increase appeal over chrismas period (Conversion rates)
+-   Product that attracted most customers over christmas period (Number of unique customers)
+-   Product that retained most customers over christmas period (Repeat sales maybe)
+-   Product with most increased revenue and sales over christmas period (Revenue and Volume)
+-   e.t.c
+
+### Implications of different metrics 
+
+"Units Sold / Volume" : 
+
+-   a product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c 
+
+-   So to use Volume we need to remove these NOISE and BIASED products 
+
+"Conversion Rates" : 
+
+-   A product can have a high conversion , but lowest units sold ... meaning these product are unreliable , NOISE , we should cut these noise if we using this metric 
+
+"Profits" : 
+
+-   Two products can have the same total profit but different costs , therefore we should couple this with profit margin (%) , high margin implies low cost and high profit ... meaning we should filter out products with high profit but low margins , they are NOISE in this case . 
+
+
+
+
