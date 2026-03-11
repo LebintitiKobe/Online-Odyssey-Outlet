@@ -76,7 +76,7 @@ Senior stakeholders are interested in knowing which products performed best duri
 
 "Conversion Rates" : 
 
--   A product can have a high conversion , but lowest units sold ... meaning these product are unreliable , NOISE , we should cut these noise if we using this metric 
+-   A product can have a high conversion , but lowest units sold ... meaning these product are unreliable , NOISE , we should cut these noise if we using this metric . Also issues with UNITS SOLD Carry over to this metric too .
 
 "Profits" : 
 
