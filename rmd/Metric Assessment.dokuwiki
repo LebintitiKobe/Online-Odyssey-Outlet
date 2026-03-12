@@ -1,0 +1,103 @@
+====== Problem Statement ======
+
+> You are a junior analyst working for an e-commerce startup, Online Odyssey Outlet.
+
+> The date is January 2020, and the startup has just been through its first winter sale. Senior stakeholders are interested in knowing which products performed best during the Christmas period so that they can streamline the products they advertise in future sale periods.
+
+
+----
+
+> You will do this by analyzing up to two months of events data, presented as two separate data sources with identical structures. Events refer not just to sales but to more general customer actions, such as viewing a product on the website or placing it into their virtual cart.
+
+
+----
+
+> The challenge is that, when pressed, stakeholders aren’t exactly sure what they mean by “best.” In an initial brainstorming session, they highlight some aspects they care about when ranking their products:
+
+>   * Volume of sales
+>   * Total revenue from a single product
+>   * Popularity, measured by the number of unique customers who bought a product
+>   * Conversion, meaning the percentage of time a product is bought once it has been placed in the virtual shopping cart
+>   * Products with increased performance from November to December
+
+====== Systems Thinking ======
+
+===== 1. Understanding the problem : =====
+
+Senior stakeholders are interested in knowing which products performed best during the Christmas period so that they can streamline the products they advertise in future sale periods.
+
+==== What are our hoping stakeholders to achieve if they advertise the best performing products : ====
+
+  * To attract and retain new customers
+  * To improve sales
+  * To increase revenue
+  * To increase brand awareness and presence
+  * e.t.c
+
+==== What system are we breaking down ? ====
+
+  * System to attract and retain new customes
+  * System to improve sales
+  * System to improve revenue
+  * System to increase brand awareness/presence
+
+==== Elements of the system ? ====
+
+  * Customers
+  * Products
+  * Store Workers
+  * e.t.c
+
+==== Activities by customers in the online store sales system ? ====
+
+  - Browse items :
+
+What other activities take place as customers browse item on the online store ? What else could happen as customers browse items ?
+
+  * They see products that got no stocks left
+  * They see product prices
+  * They see products that are available and with stock
+  * They compare product prices
+  * They read descriptions
+  * They read reviews
+  * They check product ratings
+  * They click and view individual products
+  * They add products to cart
+  * They remove products from carts
+  * They buy/checkout the products in carts
+
+  - Other activities that stem from above activities :
+
+  * They get frustrated / complain / leave when they see the product they looking for with no stock .
+  * They lose faith/loyalty in our business when they see products with no store .
+  * They buy product that are a little cheaper .
+  * They decide whether to buy or not , decide whether to trust/test the product judging by its reviews and ratings
+  * They wait for their orders to get delivers
+  * They can reschedule their deliveries
+  * They complain if deliveries dont arrive on promised date
+  * They can cancel their orders
+  * They can test and return products or if they not what they expected
+  * They can recommend people to our store
+  * They can share experience with others
+  * They can write reviews on the products
+  * e.t.c
+
+==== Activities by store managers in the online store sales system ? ====
+
+  - Handle orders :
+
+What could happen as store workers handle/deal with orders :
+
+  * Product inventory drops
+  * Product stock-outs occur
+  * Wrong items can be delivered to wrong customers
+  * Products can get damaged
+  * Store workers can get stressed as workload increases
+  * People can resign as they get overworked or burnout
+  * Conflict between employees can occur
+
+Other activities / What could happen as above activities occur ?
+
+  * Customers get frustrated / complain / return / turnish the brand / write negative reviews / lose trust / got to other stores / e.t.c.
+  * Lose potential revenue from damaged products / revenue loss , Employees can get warnings / lose their jobs , Damages get deducted from employee wages
+  * 
