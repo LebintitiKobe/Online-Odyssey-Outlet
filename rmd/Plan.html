@@ -110,10 +110,17 @@ ul.task-list li input[type="checkbox"] {
 <li>e.t.c</li>
 </ul>
 </section>
-<section id="therefore-best-performing-product-over-christmas-period" class="level3">
-<h3 class="anchored" data-anchor-id="therefore-best-performing-product-over-christmas-period">Therefore “best performing product over christmas period” :</h3>
+<section id="product" class="level3">
+<h3 class="anchored" data-anchor-id="product">“Product” ? :</h3>
+<p>What do we mean by product ? :</p>
 <ul>
-<li>Product that had an increase appeal over chrismas period (Conversion rates)</li>
+<li>Here product can mean an individual product , product brands , product categories , e.t.c . Choose any level of granularity .</li>
+</ul>
+</section>
+<section id="therefore-best-performing-product-over-christmas-period" class="level3">
+<h3 class="anchored" data-anchor-id="therefore-best-performing-product-over-christmas-period">Therefore “best performing product over christmas period” ? :</h3>
+<ul>
+<li>Product that had an increase appeal over christmas period (Conversion rates)</li>
 <li>Product that attracted most customers over christmas period (Number of unique customers)</li>
 <li>Product that retained most customers over christmas period (Repeat sales maybe)</li>
 <li>Product with most increased revenue and sales over christmas period (Revenue and Volume)</li>
@@ -122,20 +129,73 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="implications-of-different-metrics" class="level3">
 <h3 class="anchored" data-anchor-id="implications-of-different-metrics">Implications of different metrics</h3>
-<p>“Units Sold / Volume” :</p>
+<p><strong> “Units Sold / Volume” : </strong></p>
 <ul>
-<li><p>a product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c</p></li>
-<li><p>So to use Volume we need to remove these NOISE and BIASEd products</p></li>
+<li>a product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c</li>
+<li>So to use Volume we need to remove these NOISE and BIASED products</li>
 </ul>
-<p>“Conversion Rates” :</p>
+<p><strong> “Conversion Rates” : </strong></p>
 <ul>
-<li>A product can have a high conversion , but lowest units sold … meaning these product are unreliable , NOISE , we should cut these noise if we using this metric</li>
+<li>A product can have a high conversion , but lowest units sold … meaning these product are unreliable , NOISE , we should cut these noise if we using this metric . Also issues with UNITS SOLD Carry over to this metric too .</li>
 </ul>
-<p>“Profits” :</p>
+<p><strong> “Profits” : </strong></p>
 <ul>
 <li>Two products can have the same total profit but different costs , therefore we should couple this with profit margin (%) , high margin implies low cost and high profit … meaning we should filter out products with high profit but low margins , they are NOISE in this case .</li>
 </ul>
 </section>
+</section>
+<section id="assess-volumeunits-sold-a-metric" class="level2">
+<h2 class="anchored" data-anchor-id="assess-volumeunits-sold-a-metric">Assess Volume(Units Sold) A Metric</h2>
+<section id="implications" class="level3">
+<h3 class="anchored" data-anchor-id="implications">Implications</h3>
+<p>A product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c . So to use Volume we need to remove these NOISE and BIASED products</p>
+<ul>
+<li><p>A product with high volume but few unique buyers is bad for advertisement , it will attract only those few customers . Set a threshold for number of unique buyers in order to remove the bias , meaning products we choose will have solid business value .</p></li>
+<li><p>A product with high volume but bad ratings are also bad for bad for business , low ratings mean our customers are unhappy therefore more likely to churn . Set a threshold for product rating to make sure we pick products that will ensure long term business success .</p></li>
+<li><p>A product with high volume , high total profit is actually bad if its margin is low . It will require more inventory space and to outsell itself in order to make significant profit , this product can be unreliable / practical . Set a threshold for profit margin in order to discard these unreliable products</p></li>
+</ul>
+</section>
+<section id="systems-thinking-assessment" class="level3">
+<h3 class="anchored" data-anchor-id="systems-thinking-assessment">Systems Thinking assessment</h3>
+<p>In order for Units sold to work as a metric :</p>
+<ul>
+<li><p>Adjust for return , stock-outs , discounts , ratings/reviews [Done] , Product appeal .</p></li>
+<li><p>For product appeal , use conversion rates . But a product with high conversion but a few views / sales is bad for business . Set a threshold for units sold .</p></li>
+<li><p>For returns , we subtract product returns volumes from units sold to adjust for returns</p></li>
+<li><p>For stock-outs/ discounts , drop sales records that occurred during discounts / stock-out periods in order to make product comparisons without any biases .</p></li>
+</ul>
+</section>
+</section>
+<section id="final-metrics-set" class="level2">
+<h2 class="anchored" data-anchor-id="final-metrics-set">Final Metrics set</h2>
+<ul>
+<li>Rank our products by Net Units sold , with threshold set for Rating/Reviews , Number of unique buyers , profit margin and excluding records during product stock-outs and discounts periods .</li>
+</ul>
+</section>
+<section id="start-at-the-end" class="level2">
+<h2 class="anchored" data-anchor-id="start-at-the-end">2. Start at the End</h2>
+<p>Our final results or minimum viable answer will be a table of Products / Product brands / Categories rank by our growth rates of Net Units sold , with all necessary adjustments , from November to December .</p>
+</section>
+<section id="identify-the-additional-resources-need-to-obtain-our-required-data" class="level2">
+<h2 class="anchored" data-anchor-id="identify-the-additional-resources-need-to-obtain-our-required-data">3. Identify the additional resources need to obtain our required data</h2>
+<p>What are the additional resources (data , people , access permission) needed in order to get our minimum viable solution ?</p>
+<ul>
+<li><p>Here we need sales data for november and december , in which we can be able for find and calculate all the metric mentioned in our final metric set and find necessary growth rates need to rank our products .</p></li>
+<li><p>Also we will need data recorded for products that were returned after they were bought from the online store .</p></li>
+<li><p>Also we will need data we can use to augment our data with stock-out and discount periods for different products .</p></li>
+</ul>
+<p>For these identify the people and access permission that may be need to get these data .</p>
+<p>In our case , the data is provided for us . And its the only data that is available to us .</p>
+</section>
+<section id="do-the-work" class="level2">
+<h2 class="anchored" data-anchor-id="do-the-work">4. Do The Work</h2>
+<p><strong>Plan :</strong></p>
+<ul>
+<li>Clean bought november and december data</li>
+<li>Transform the data to product level with all necessary metric calculated .</li>
+<li>Then merge the clean versions of november and december data in order to be able to calculate our growth rates of each product from november to december .</li>
+<li>Apply our necessary filters , then rank the products to present to our stakeholders .</li>
+</ul>
 </section>
 </section>
 

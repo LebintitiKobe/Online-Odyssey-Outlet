@@ -1,2 +1,7 @@
 data/december.csv.gz
 data/november.csv.gz
+
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata

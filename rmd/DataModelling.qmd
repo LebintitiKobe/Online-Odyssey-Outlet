@@ -1,0 +1,47 @@
+---
+title: "Online Odyssey Outlet - Data Modelling Script"
+author: "Lebintiti Kobe"
+format: html
+---
+
+# Load Data 
+
+```{r}
+require(tidyverse)
+require(here)
+require(skimr)
+
+nov_data <- read_csv(here("data/november.csv.gz"))
+dec_data <- read_csv(here("data/december.csv.gz"))
+
+nov_data
+dec_data
+```
+
+Merge november and december data since the have the same data schema 
+```{r}
+events_data <- bind_rows(nov_data, dec_data)
+```
+
+## Clean up character data 
+
+```{r}
+
+events_data <- events_data %>%
+    mutate(across(where(is.character), ~ trimws(.) %>% str_to_lower()))
+
+events_data
+```
+
+## Convert date column into their correct format 
+
+```{r}
+events_data <- events_data %>%
+    mutate(across(contains("time"), ~ as_datetime(.x)))
+
+events_data %>% skim()
+```
+
+## Validate the data 
+
+Validate the data to make sure it do not violate business assumption 
