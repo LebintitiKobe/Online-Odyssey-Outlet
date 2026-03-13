@@ -1,47 +1,174 @@
 ---
 title: "Online Odyssey Outlet - Data Modelling Script"
 author: "Lebintiti Kobe"
-format: html
+format:
+    gfm: 
+        code-fold: true
+        toc: true
+        toc-depth: 2
+        code-annotations: true
+        number-sections: false
+        
+execute:
+  error: false
+  warning: false
 ---
 
 # Load Data 
 
 ```{r}
+options(scipen = 999)
 require(tidyverse)
 require(here)
 require(skimr)
+require(pander)
+require(ggthemes)
 
 nov_data <- read_csv(here("data/november.csv.gz"))
 dec_data <- read_csv(here("data/december.csv.gz"))
 
-nov_data
-dec_data
+nov_data %>%
+    head() %>%
+    knitr::kable()
+dec_data %>%
+    head() %>%
+    knitr::kable()
 ```
 
-Merge november and december data since the have the same data schema 
+Merge november and december data since the have the same data schema then view the data
 ```{r}
 events_data <- bind_rows(nov_data, dec_data)
+events_data %>%
+    head() %>%
+    knitr::kable()
 ```
 
 ## Clean up character data 
 
-```{r}
+-   Convert them to the same casing 
+-   Remove whitespaces 
 
+```{r}
 events_data <- events_data %>%
     mutate(across(where(is.character), ~ trimws(.) %>% str_to_lower()))
-
-events_data
 ```
 
 ## Convert date column into their correct format 
 
+-   Convert date in character format to date format
 ```{r}
 events_data <- events_data %>%
-    mutate(across(contains("time"), ~ as_datetime(.x)))
+    mutate(across(contains("time"), ~ as_datetime(.))) %>%
+    janitor::clean_names()
+```
 
+Inspect and skim the data 
+```{r}
 events_data %>% skim()
 ```
 
 ## Validate the data 
 
-Validate the data to make sure it do not violate business assumption 
+Validate the data to make sure it do not violate business logic : 
+ 
+### Online Stores Business logic : 
+
+User Columns : 
+
+-   
+
+Date Columns : 
+
+ -  Data should be available on all business days dates .
+ -  Times of order should always be before delivery times / return times , and so on .
+
+Price Columns : 
+
+-   Prices can be less than zero .
+-   Investigate prices that are too high or too low .
+
+Products/Brands/Categories : 
+
+-   Each product ID should be unique to each product . 
+-   Each product ID should have one brand/category and so forth . 
+
+Event types : 
+
+-   Usually we should have more product impressions than cart actions , more cart actions than checkouts and so forth . 
+
+
+Of course , there is so much we can validate for online store data , but for now we focus on the data we have , nothing more nothing less . 
+
+## Products 
+
+
+
+## Dates
+
+```{r}
+event_data <- events_data %>%
+    mutate(event_date = as_date(event_time))
+```
+
+### Verify if day has a record 
+
+```{r}
+event_data %>%
+    group_by(event_date) %>%
+    count() %>%
+    filter(n < 1)
+```
+
+
+### Check the number of events distribution
+```{r}
+event_data %>%
+    group_by(event_date) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = event_date, y = n, fill = n)) +
+    geom_col(show.legend = F) +
+    labs(title = "Distribution of events per day", x = "Event Date", y = "") +
+    scale_y_continuous(n.breaks = 10, labels = scales::label_number(scale = 0.001, suffix = "K")) +
+    theme_excel_new()
+```
+
+-   Events are the lowest at the start of november , maybe be the time when the start-up launched . 
+-   Events are the highest mid-november , maybe an event was held around this time . 
+-   Then after we see a steady rise in events overtime , maybe correspond to normal business growth . 
+
+Enquire about these to figure out what was happening around these times . 
+Remember we need to adjust for any artificial boosting of events/sales because these can bias products that were advertised as part of boosting campaigns 
+
+
+## Price 
+
+### Distribution of prices 
+```{r}
+event_data %>%
+    select(product_id, price) %>%
+    distinct() %>%
+    ungroup() %>%
+    select(price) %>%
+    unique() %>%
+    ggplot(aes(x = price)) +
+    geom_histogram() +
+    labs(title = "Distribution of product prices", y = "Number of products", x = "Price") +
+    scale_x_continuous(n.breaks = 15, labels = scales::label_currency()) +
+    theme_excel_new()
+```
+
+-   We have a price range of $0 - $2600 and most products are prices below $600 . 
+
+### Investigate low and high priced products 
+
+```{r}
+event_data %>%
+    select(-contains("event"), -contains("user")) %>%
+    distinct(product_id, .keep_all = T) %>%
+    filter(price < 50)
+
+event_data %>%
+    select(-contains("event"), -contains("user")) %>%
+    distinct() %>%
+    filter(price < 2000)
+```

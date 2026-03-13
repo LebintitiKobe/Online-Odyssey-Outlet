@@ -1,0 +1,290 @@
+# Online Odyssey Outlet - Applying Systems Thinking for Metric Assessment
+Lebintiti Kobe
+
+# Problem Statement
+
+> You are a junior analyst working for an e-commerce startup, Online
+> Odyssey Outlet.
+>
+> The date is January 2020, and the startup has just been through its
+> first winter sale. Senior stakeholders are interested in knowing which
+> products performed best during the Christmas period so that they can
+> streamline the products they advertise in future sale periods.
+
+------------------------------------------------------------------------
+
+> You will do this by analyzing up to two months of events data,
+> presented as two separate data sources with identical structures.
+> Events refer not just to sales but to more general customer actions,
+> such as viewing a product on the website or placing it into their
+> virtual cart.
+
+------------------------------------------------------------------------
+
+> The challenge is that, when pressed, stakeholders aren’t exactly sure
+> what they mean by “best.” In an initial brainstorming session, they
+> highlight some aspects they care about when ranking their products:
+>
+> - Volume of sales
+> - Total revenue from a single product
+> - Popularity, measured by the number of unique customers who bought a
+>   product
+> - Conversion, meaning the percentage of time a product is bought once
+>   it has been placed in the virtual shopping cart
+> - Products with increased performance from November to December
+
+# Systems Thinking
+
+## 1. Understanding the problem :
+
+Senior stakeholders are interested in knowing which products performed
+best during the Christmas period so that they can streamline the
+products they advertise in future sale periods.
+
+### What are our hoping stakeholders to achieve if they advertise the best performing products :
+
+- To attract and retain new customers
+- To improve sales
+- To increase revenue
+- To increase brand awareness and presence
+- e.t.c
+
+### What system are we breaking down ?
+
+- System to attract and retain new customes
+- System to improve sales
+- System to improve revenue
+- System to increase brand awareness/presence
+
+### Elements of the system ?
+
+- Customers
+- Products
+- Store Workers
+- e.t.c
+
+### Activities by customers in the online store sales system ?
+
+1.  Browse items :
+
+What else could happen as customers browse items ?
+
+- Website can crash if there is too much traffic
+- They see products that got no stocks left
+- They see product prices
+- They see products that are available and with stock
+- They compare product prices
+- They read descriptions
+- They read reviews
+- They check product ratings
+- They click and view individual products and read descriptions .
+- Compare product specs .
+- They add products to cart
+- They remove products from carts
+- They buy/checkout the products in carts
+
+2.  What else could happen when customers do the above activities :
+
+Webcrash :
+
+- Potential sales get lost if there is a web crashes .
+- Pressure increases for the web team to fix the site .
+- Web quality can get re-evaluated / web team can get reassessed /
+  Employees can lose their jobs .
+- Customers lose faith / trust / loyalty in our brand .
+- We lose customers / potential repeat sales .
+- Bad word of mouth spreads if there is a web crash .
+- Customers get discouraged to revisit the site .
+- Customers may think the whole business got shut down .
+
+Stock-Outs:
+
+- They get frustrated / complain / leave / look for product elsewhere
+  when they see the product they looking for with no stock .
+- They lose faith/loyalty in our business when they see products with no
+  store .
+- Business lose potential sales from stockouts .
+- Inventory management get reassessed . Restocking pressure can increase
+  .
+
+Prices :
+
+- They buy product that are a little cheaper .
+- High value products lose potential sales .
+- High value products can get removed from the store catalogue .
+- Read reviews and descriptions to see if the products are worth the
+  price . They can then get encouraged/discouraged to buy the item .
+
+Reviews/Description Reading :
+
+- They decide whether to buy or not , decide whether to trust/test the
+  product judging by its reviews and ratings .
+- Products with no reviews / no descriptions can not be taken into
+  consideration/ discourage customers from buying .
+
+Add to Cart :
+
+- Products in cart get reviewed before check-out .
+- Can remove products in cart , if the total amount is above their
+  budget or change their mind on a product .
+- They can leave without checking out .
+- They can reset the whole cart .
+- They can proceed to check-out .
+
+Check-Outs :
+
+- They can stop the whole check-out process if they not comfortable with
+  given out their personal infomation .
+- They can make mistakes in when typing details such as name , delivery
+  addresses e.t.c. Which leads to delivery delays . Delays lead to bad
+  WOM , reviews , complaints , lose of trust , lose of future customers
+  .
+- They can request refunds . Lose potential revenue . Receive a bad
+  complaint / review .
+- They wait for their orders to get delivers .
+- They can reschedule their deliveries .
+- They complain if deliveries dont arrive on promised date .
+- They can cancel their orders .
+- Check-outs increases number of orders/deliveries store employees have
+  to handle . Stress levels increase , then packaging mistakes and
+  damages . Customers receive incorrect items , which leads to returns /
+  complaint / bad WOM . Also decreases product inventory , which leads
+  to stock-outs .
+
+Product Arrival :
+
+- Delivery personal can get lost if not given proper addresses / can
+  damage the items , e.t.c .
+- They can test products , return product if they not what they expected
+  .
+- They can recommend people to our store .
+- They can share experience with others .
+- They can write reviews on the products .
+
+### Activities by store employees :
+
+1.  Handle orders/deliveries :
+
+What could happen as store workers handle/deal with orders :
+
+- Product inventory drops . Product stock-outs occur
+- Wrong items can be delivered to wrong customers .
+- Store workers can get stressed as workload increases . Products can
+  get damaged . Employees can get warnings / lose their jobs , Damages
+  get deducted from employee wages . People can resign as they get
+  overworked or burnout . Conflict between employees can occur . Scandal
+  occurs which turnish brand reputation .
+
+# Stocks from activities :
+
+For each activity , what can be measured ? What depletes or accumulate ?
+What else can be infered for the activity’s stock ?
+
+1.  Browsing :
+
+Number of Customers browsing (Web traffic) Number of new customers
+Number of repeat customers Product impression Web traffic capacity
+
+2.  Web Crash :
+
+Number of web crashes Web quality / server quality Web traffic capacity
+Customer trust Brand reputation Lost Sales Brand awareness / presence
+Web team stress levels Web team workload Web team quality Web team skill
+Web team experience Job loss Scandal / Conflicts Brand reputation
+Customer churn Bad word of mouth
+
+3.  Stock-Outs :
+
+Product stock-outs Product Inventory Purchase Intent Lost sale Customer
+Trust Customer disatisfaction Customer complaints
+
+4.  Price :
+
+Product Price Purchase Intent Customer trust Complaints Brand reputation
+Customer satisfaction Product Cost Product Profit
+
+5.  Descriptions :
+
+Product description length Product description quality/clearity Purchase
+Intent Customer Trust Product quality (from specs)
+
+6.  Reviews :
+
+Product rating Number of good reviews Number of bad reviews Purchase
+Intent Customer Trust Brand reputation Customer satisfaction
+
+7.  Click/Views
+
+Product clicks Products views Product appeal
+
+8.  Cart Add / Removal
+
+Number of times product got added to cart Number of times product got
+removed from cart Purchase Intent Customer Budget Cart total Product
+appeal
+
+9.  Check-Outs
+
+Number of store orders Employee workload Employee stress level Product
+inventory Number of store deliveries
+
+``` mermaid
+ 
+graph  
+
+WebTraffic --> |+| ProductImpressions 
+WebTraffic --> |+| ServerOverloads
+ServerOverloads --> |+| WebCrashes
+WebCrashes --> |-| ProductUnitsSold
+WebCrashes --> |-| CustomerSatisfaction 
+CustomerSatisfaction --> |+| GoodWOM
+GoodWOM --> |+| NewCustomers 
+NewCustomers --> |+| WebTraffic
+CustomerBase --> |+| WebTraffic
+ProductImpressions -->|+| ProductViews
+ProductAppeal --> |+| ProductViews
+ProductViews --> |+| ProductCartAdditions
+BadReviews --> |-| PurchaseIntent
+GoodReviews --> |+| PurchaseIntent
+ClearDescriptions --> |+| PurchaseIntent
+PurchaseIntent --> |+| ProductCartAdditions
+ProductStock-Outs --> |-| ProductCartAdditions
+ProductStock-Outs --> |-| CustomerSatisfaction
+ProductCartAdditions --> |+| ProductCheck-Outs
+ProductCheck-Outs --> |+| ProductUnitsSold
+ProductUnitsSold --> |-| ProductInventory
+ProductCheck-Outs --> |+| CustomerBase
+ProductCheck-Outs --> |+| StoreOrders
+StoreOrders --> |+| EmployeeWorkload
+EmployeeWorkload --> |+| EmployeeStressLevel
+EmployeeWorkload --> |+| Damages
+EmployeeWorkload --> |+| DeliveryDelays
+ProductUnitsSold --> |+| ProductRevenue 
+ProductRevenue --> |+| ProductProfit
+ProductProfit -->|+| ProductInventory
+ProductInventory --> |-| ProductStock-Outs
+Returns --> |-| ProductUnitsSold
+Damages --> |+| Returns
+DeliveryDelays --> |+| Returns
+DeliveryDelays --> |-| CustomerSatisfaction
+Damages --> |+| Returns
+Damages --> |+| BadReviews
+EmployeeStressLevel --> |+| Conflicts
+Conflicts --> |-| GoodWOM
+ProductPrice --> |-| PurchaseIntent
+ProductPrice --> |+| ProductRevenue
+ProductCost --> |-| ProductProfit
+ProductDiscounts --> |-| ProductRevenue
+ProductDiscounts --> |+| GoodWOM
+ProductDiscounts --> |+| ProductAppeal
+ProductPrice --> |-| ProductAppeal
+CustomerBudget --> |-| ProductCartAdditions
+CustomerSatisfaction --> |-| CustomerChurn
+CustomerChurn --> |-| CustomerBase
+WebCrashes --> |+| CustomerChurn
+Returns --> |+| Refunds
+Refunds --> |+| ProductRevenue
+WebCrashes --> |-| CustomerSatisfaction
+ProductUnitsSold --> |+| ProductPrice 
+WebCrashes --> EmployeeStressLevel
+```
