@@ -4,66 +4,47 @@ author: "Lebintiti Kobe"
 format: gfm
 ---
 
-# Problem Statement 
+# Problem Statement
 
- >
-You are a junior analyst working for an e-commerce startup, Online
-Odyssey Outlet.
+> You are a junior analyst working for an e-commerce startup, Online Odyssey Outlet.
 >
->
-The date is January 2020, and the startup has just been through its first winter sale.
-Senior stakeholders are interested in knowing which products performed best during
-the Christmas period so that they can streamline the products they advertise in future
-sale periods.
->
+> The date is January 2020, and the startup has just been through its first winter sale. Senior stakeholders are interested in knowing which products performed best during the Christmas period so that they can streamline the products they advertise in future sale periods.
 
----
+------------------------------------------------------------------------
 
->
- You will do this by analyzing up to two months of events data, presented
-as two separate data sources with identical structures. Events refer not just to sales but
-to more general customer actions, such as viewing a product on the website or placing
-it into their virtual cart.
->
+> You will do this by analyzing up to two months of events data, presented as two separate data sources with identical structures. Events refer not just to sales but to more general customer actions, such as viewing a product on the website or placing it into their virtual cart.
 
----
+------------------------------------------------------------------------
 
+> The challenge is that, when pressed, stakeholders aren’t exactly sure what they mean by “best.” In an initial brainstorming session, they highlight some aspects they care about when ranking their products:
 >
- The challenge is that, when pressed, stakeholders aren’t exactly sure what they
-mean by “best.” In an initial brainstorming session, they highlight some aspects they
-care about when ranking their products:
->
->
--   Volume of sales
--   Total revenue from a single product
--   Popularity, measured by the number of unique customers who bought a product
--   Conversion, meaning the percentage of time a product is bought once it has
-been placed in the virtual shopping cart
--   Products with increased performance from November to December
->
+> -   Volume of sales
+> -   Total revenue from a single product
+> -   Popularity, measured by the number of unique customers who bought a product
+> -   Conversion, meaning the percentage of time a product is bought once it has been placed in the virtual shopping cart
+> -   Products with increased performance from November to December
 
+# Results driven approach
 
-# Results driven approach 
-
-## 1. Understanding the problem : 
+## 1. Understanding the problem :
 
 Senior stakeholders are interested in knowing which products performed best during the Christmas period so that they can streamline the products they advertise in future sale periods.
 
-### What are our hoping stakeholders to achieve if they advertise the best performing products : 
+### What are our hoping stakeholders to achieve if they advertise the best performing products :
 
--   To attract and retain new customers 
--   To improve sales 
--   To increase revenue 
--   To increase brand awareness and presence 
+-   To attract and retain new customers
+-   To improve sales
+-   To increase revenue
+-   To increase brand awareness and presence
 -   e.t.c
 
-### "Product" ? : 
+### "Product" ? :
 
-What do we mean by product ? : 
+What do we mean by product ? :
 
--   Here product can mean an individual product , product brands , product categories , e.t.c . Choose any level of granularity . 
+-   Here product can mean an individual product , product brands , product categories , e.t.c . Choose any level of granularity .
 
-### Therefore "best performing product over christmas period" ? : 
+### Therefore "best performing product over christmas period" ? :
 
 -   Product that had an increase appeal over christmas period (Conversion rates)
 -   Product that attracted most customers over christmas period (Number of unique customers)
@@ -71,93 +52,72 @@ What do we mean by product ? :
 -   Product with most increased revenue and sales over christmas period (Revenue and Volume)
 -   e.t.c
 
-### Implications of different metrics 
+### Implications of different metrics
 
-**
-"Units Sold / Volume" : 
-**
+**"Units Sold / Volume" :**
 
--   a product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c 
--   So to use Volume we need to remove these NOISE and BIASED products 
+-   a product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c
+-   So to use Volume we need to remove these NOISE and BIASED products
 
-**
-"Conversion Rates" : 
-**
+**"Conversion Rates" :**
 
 -   A product can have a high conversion , but lowest units sold ... meaning these product are unreliable , NOISE , we should cut these noise if we using this metric . Also issues with UNITS SOLD Carry over to this metric too .
 
-**
-"Profits" : 
-**
+**"Profits" :**
 
--   Two products can have the same total profit but different costs , therefore we should couple this with profit margin (%) , high margin implies low cost and high profit ... meaning we should filter out products with high profit but low margins , they are NOISE in this case . 
+-   Two products can have the same total profit but different costs , therefore we should couple this with profit margin (%) , high margin implies low cost and high profit ... meaning we should filter out products with high profit but low margins , they are NOISE in this case .
 
+## Assess Volume(Units Sold) A Metric
 
-## Assess Volume(Units Sold) A Metric 
+### Implications
 
-### Implications 
-
-A product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c .
-So to use Volume we need to remove these NOISE and BIASED products 
+A product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c . So to use Volume we need to remove these NOISE and BIASED products
 
 -   A product with high volume but few unique buyers is bad for advertisement , it will attract only those few customers . Set a threshold for number of unique buyers in order to remove the bias , meaning products we choose will have solid business value .
 
+-   A product with high volume but bad ratings are also bad for bad for business , low ratings mean our customers are unhappy therefore more likely to churn . Set a threshold for product rating to make sure we pick products that will ensure long term business success .
 
--  A product with high volume but bad ratings are also bad for bad for business , low ratings mean our customers are unhappy therefore more likely to churn . Set a threshold for product rating to make sure we pick products that will ensure long term business success . 
+-   A product with high volume , high total profit is actually bad if its margin is low . It will require more inventory space and to outsell itself in order to make significant profit , this product can be unreliable / practical . Set a threshold for profit margin in order to discard these unreliable products
 
--   A product with high volume , high total profit is actually bad if its margin is low . It will require more inventory space and to outsell itself in order to make significant profit , this product can be unreliable / practical . Set a threshold for profit margin in order to discard these unreliable products 
+### Systems Thinking assessment
 
-### Systems Thinking assessment 
+In order for Units sold to work as a metric :
 
-In order for Units sold to work as a metric : 
-
--   Adjust for return , stock-outs , discounts , ratings/reviews [Done] , Product appeal .
+-   Adjust for return , stock-outs , discounts , ratings/reviews \[Done\] , Product appeal .
 
 -   For product appeal , use conversion rates . But a product with high conversion but a few views / sales is bad for business . Set a threshold for units sold .
 
--   For returns , we subtract product returns volumes from units sold to adjust for returns 
+-   For returns , we subtract product returns volumes from units sold to adjust for returns
 
--   For stock-outs/ discounts , drop sales records that occurred during discounts / stock-out periods in order to make product comparisons without any biases . 
+-   For stock-outs/ discounts , drop sales records that occurred during discounts / stock-out periods in order to make product comparisons without any biases .
 
+## Final Metrics set
 
+-   Rank our products by Net Units sold , with threshold set for Rating/Reviews , Number of unique buyers , profit margin and excluding records during product stock-outs and discounts periods .
 
+## 2. Start at the End
 
-## Final Metrics set 
+Our final results or minimum viable answer will be a table of Products / Product brands / Categories rank by our growth rates of Net Units sold , with all necessary adjustments , from November to December .
 
--  Rank our products by Net Units sold , with threshold set for Rating/Reviews , Number of unique buyers , profit margin and excluding records during product stock-outs and discounts periods . 
+## 3. Identify the additional resources need to obtain our required data
 
-
-
-## 2. Start at the End 
-
- Our final results or minimum viable answer will be a table of Products / Product brands / Categories rank by our growth rates of Net Units sold , with all necessary adjustments , from November to December . 
-
-
-## 3. Identify the additional resources need to obtain our required data 
-
- What are the additional resources (data , people , access permission) needed in order to get our minimum viable solution ? 
+What are the additional resources (data , people , access permission) needed in order to get our minimum viable solution ?
 
 -   Here we need sales data for november and december , in which we can be able for find and calculate all the metric mentioned in our final metric set and find necessary growth rates need to rank our products .
 
--   Also we will need data recorded for products that were returned after they were bought from the online store . 
--   Also we will need data we can use to augment our data with stock-out and discount periods for different products . 
+-   Also we will need data recorded for products that were returned after they were bought from the online store .
 
+-   Also we will need data we can use to augment our data with stock-out and discount periods for different products .
 
-For these identify the people and access permission that may be need to get these data . 
+For these identify the people and access permission that may be need to get these data .
 
-In our case , the data is provided for us . And its the only data that is available to us . 
+In our case , the data is provided for us . And its the only data that is available to us .
 
-## 4. Do The Work 
+## 4. Do The Work
 
 **Plan :**
 
--   Clean bought november and december data 
+-   Clean bo november and december data
 -   Transform the data to product level with all necessary metric calculated .
 -   Then merge the clean versions of november and december data in order to be able to calculate our growth rates of each product from november to december .
--   Apply our necessary filters , then rank the products to present to our stakeholders . 
-
-
-
-
-
-
+-   Apply our necessary filters , then rank the products to present to our stakeholders .

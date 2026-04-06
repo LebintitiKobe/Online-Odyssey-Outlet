@@ -2,173 +2,701 @@
 title: "Online Odyssey Outlet - Data Modelling Script"
 author: "Lebintiti Kobe"
 format:
-    gfm: 
-        code-fold: true
+    gfm:
         toc: true
         toc-depth: 2
         code-annotations: true
         number-sections: false
-        
+
 execute:
   error: false
   warning: false
+editor_options: 
+  chunk_output_type: console
 ---
 
-# Load Data 
+# Load Libraries
 
 ```{r}
 options(scipen = 999)
 require(tidyverse)
 require(here)
 require(skimr)
-require(pander)
 require(ggthemes)
+require(kableExtra)
+require(arrow)
+```
 
+# Load Data
+
+```{r}
 nov_data <- read_csv(here("data/november.csv.gz"))
 dec_data <- read_csv(here("data/december.csv.gz"))
-
-nov_data %>%
-    head() %>%
-    knitr::kable()
-dec_data %>%
-    head() %>%
-    knitr::kable()
 ```
 
 Merge november and december data since the have the same data schema then view the data
+
 ```{r}
-events_data <- bind_rows(nov_data, dec_data)
-events_data %>%
-    head() %>%
-    knitr::kable()
+events_data <- bind_rows(nov_data, dec_data) %>%
+  janitor::clean_names()
 ```
 
-## Clean up character data 
+## Clean up character data
 
--   Convert them to the same casing 
--   Remove whitespaces 
+-   Convert them to the same casing
+-   Remove whitespaces
 
 ```{r}
 events_data <- events_data %>%
-    mutate(across(where(is.character), ~ trimws(.) %>% str_to_lower()))
+  mutate(across(where(is.character), ~ trimws(.) %>% str_to_lower())) %>%
+  mutate(across(contains("id"), ~ as.character(.)))
 ```
 
-## Convert date column into their correct format 
+## Convert date column into their correct format
 
 -   Convert date in character format to date format
+
 ```{r}
 events_data <- events_data %>%
-    mutate(across(contains("time"), ~ as_datetime(.))) %>%
-    janitor::clean_names()
+  mutate(across(contains("time"), ~ as_datetime(.)))
 ```
 
-Inspect and skim the data 
-```{r}
-events_data %>% skim()
-```
+## Validate the data
 
-## Validate the data 
+Validate the data to make sure it do not violate business logic :
 
-Validate the data to make sure it do not violate business logic : 
- 
-### Online Stores Business logic : 
+### Online Stores Business logic :
 
-User Columns : 
+User Columns :
 
--   
+-   Each row of our data should have a session_id
 
-Date Columns : 
+Event types :
 
- -  Data should be available on all business days dates .
- -  Times of order should always be before delivery times / return times , and so on .
+-   Usually we should have more product impressions than cart actions , more cart actions than checkouts and so forth .
 
-Price Columns : 
+Date Columns :
+
+-   Data should be available on all business days dates .
+-   Times of order should always be before delivery times / return times , and so on .
+
+Price Columns :
 
 -   Prices can be less than zero .
 -   Investigate prices that are too high or too low .
 
-Products/Brands/Categories : 
+Products/Brands/Categories :
 
--   Each product ID should be unique to each product . 
--   Each product ID should have one brand/category and so forth . 
+-   Each product ID should be unique to each product .
+-   Each product ID should have one brand/category and so forth .
 
-Event types : 
+Of course , there is so much we can validate for online store data , but for now we focus on concepts that can be found in the data we have , nothing more nothing less .
 
--   Usually we should have more product impressions than cart actions , more cart actions than checkouts and so forth . 
+::: callout-note
+In this case if a product has multiple brands , category code and category ID , we assign the most common brand , category code and ID in order to not have multiple values for brand and category columns .
 
+A better way to do things here is to actually assign the most recent brand , category code and ID to products with multiple values in these columns . This makes sense in online store case , so store manager can know which other past values were assign to the most recent , hence use value in those columns .
+:::
 
-Of course , there is so much we can validate for online store data , but for now we focus on the data we have , nothing more nothing less . 
+## User Columns
 
-## Products 
+```{r}
+events_data %>%
+  select(contains("user")) %>%
+  skim()
+```
 
+-   We have 27 events records without any user_id . Lets investing these
 
+```{r}
+events_data %>%
+  filter(is.na(user_session)) %>%
+  select(event_type, user_id, price, user_session) %>%
+  print(n = 50) %>%
+  kable()
+```
+
+-   These are all Cart events . These should normally have session_ids , but it is possible , maybe the user lost connection and when they got reconnected they were assigned a new session id
+
+-   For now we keep all these , in order to get true conversion of all out items
+
+## Events types
+
+```{r}
+events_data %>%
+  janitor::tabyl(event_type) %>%
+  kable()
+```
+
+-   75% of all our events are cart events , which is to be expected in an online store system . People can add products to cart only to change their mind , or only to buy only those they can afford , mater fact not all items in cart usually get paid for .
 
 ## Dates
 
 ```{r}
-event_data <- events_data %>%
-    mutate(event_date = as_date(event_time))
+events_data %>%
+  select(contains("time")) %>%
+  skim()
 ```
 
-### Verify if day has a record 
+-   Our dates range from 2019-11-01 to 2019-12-31 . Which reassures us that our data was merged correctly .
+
+### Verify if each working day has a record
+
+-   Unlike physical stores , online store can run even on non-working days .
+
+::: callout-note
+-   But if we had to find a list of all business days from one date to another , we use the {bizdays} and {timeDate} r package .
+-   bizdays::bizseq(from,to,"weekends",holidays) , to find all business days besides weekends but this includes holidays .
+-   For holidays , we use timeDate::holidays(from , to , cal = "US") .
+-   Then setdiff(bizdays_no_weekends,holidays) , to find all business days not in holidays .
+:::
 
 ```{r}
-event_data %>%
-    group_by(event_date) %>%
-    count() %>%
-    filter(n < 1)
+events_data <- events_data %>%
+  mutate(event_date = as_date(event_time))
+
+events_data %>%
+  group_by(event_date) %>%
+  count() %>%
+  filter(n < 1) %>%
+  kable()
+```
+
+-   No results got returned meaning there is no working date without a record / event , therefore we can be a little extra confident on our data
+
+### Check the number of events distribution for each day of our event times
+
+```{r}
+events_data %>%
+  group_by(event_date) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x = event_date, y = n, fill = n)) +
+  geom_col(show.legend = F) +
+  labs(title = "Distribution of events per day", x = "Event Date", y = "") +
+  scale_y_continuous(
+    n.breaks = 10,
+    labels = scales::label_number(scale = 0.001, suffix = "K")
+  ) +
+  theme_excel_new()
+```
+
+-   Events are the lowest at the start of november , maybe be the time when the start-up launched (It actually the time the start up launched) .
+-   Events are the highest mid-november , maybe an event was held around this time .
+-   Then after we see a steady rise in events overtime , maybe correspond to normal business growth .
+
+Enquire about these to figure out what was happening around these times . Remember we need to adjust for any artificial boosting of events/sales because these can bias products that were advertised as part of boosting campaigns
+
+## Price
+
+```{r}
+events_data %>%
+  select(price) %>%
+  skim()
+```
+
+-   We have a price range of \\\$0 - \\\$2600 and most products are prices below \$600 . More than 75% of the prices are below \$400
+
+### Investigate low price products
+
+```{r}
+events_data %>%
+  distinct(product_id, .keep_all = T) %>%
+  filter(price <= 0) %>%
+  distinct(product_id, .keep_all = T)
+
+zero_price_ids <- events_data %>%
+  distinct(product_id, .keep_all = T) %>%
+  filter(price <= 0) %>%
+  distinct(product_id, .keep_all = T) %>%
+  pull(product_id)
+
+events_data %>%
+  filter(product_id %in% zero_price_ids) %>%
+  arrange(product_id) %>%
+  group_by(product_id) %>%
+  summarise(
+    n_event_type = length(list(unique(event_type))),
+    n_brands = length(list(unique(brand)))
+  ) %>%
+  filter(n_brands > 1 | n_event_type > 1)
+```
+
+-   We have around 1400 products with prices of zero , all of them do not have brands codes and they dont have any purchase event . These may products that we dropped from the catalog by some brand which was not selling well .
+-   Here we can drop the products since it wont be possible to calculate metrics like Revenue , Conversion , e.t.c
+
+```{r}
+events_data <- events_data %>%
+  filter(!product_id %in% zero_price_ids)
+```
+
+### Investigate high priced products
+
+```{r}
+events_data %>%
+  select(-contains("event"), -contains("user")) %>%
+  filter(price > 2000) %>%
+  janitor::tabyl(category_code) %>%
+  arrange(desc(percent)) %>%
+  kable()
+```
+
+-   Looking at top categories of high priced items by number of events , the categories listed here are usually high prices , there is nothing too suspicious here .
+
+## Products
+
+Check if each product_id is associated with one brand and category
+
+```{r}
+dup_data <- events_data %>%
+  group_by(product_id) %>%
+  summarise(
+    n_brands = n_distinct(brand),
+    n_cat_id = n_distinct(category_id),
+    n_cat_code = n_distinct(category_code)
+  )
+
+dup_ids <- dup_data %>%
+  filter(n_brands > 1 | n_cat_id > 1 | n_cat_code > 1) %>%
+  pull(product_id)
+
+events_data %>%
+  filter(product_id %in% dup_ids) %>%
+  arrange(product_id) %>%
+  distinct(product_id, category_code, category_id, brand, .keep_all = T) %>%
+  print(n = 100)
+```
+
+### If a product has two distinct brands / categories but one is NULL , replace NULL with the other brand / category
+
+```{r}
+merge_data <- events_data %>%
+  filter(product_id %in% dup_ids) %>%
+  arrange(product_id) %>%
+  distinct(product_id, brand, category_id, category_code) %>%
+  group_by(product_id) %>%
+  mutate(
+    brands = list(brand),
+    cat_ids = list(category_id),
+    cat_codes = list(category_code)
+  ) %>%
+  rowwise() %>%
+  mutate(
+    brands = unique(brands) %>% na.omit() %>% list(),
+    cat_ids = unique(brands) %>% na.omit() %>% list(),
+    cat_codes = unique(cat_codes) %>% na.omit() %>% list(),
+    brand_new = ifelse(
+      length(brands) == 1 & length(brands[1]) > 0 & is.na(brand),
+      brands[1],
+      brand
+    ),
+    category_id_new = ifelse(
+      length(cat_ids) == 1 & length(cat_ids[1]) > 0 & is.na(category_id),
+      cat_ids[1],
+      category_id
+    ),
+    category_code_new = ifelse(
+      length(cat_codes) == 1 & length(cat_codes[1]) > 0 & is.na(category_code),
+      cat_codes[1],
+      category_code
+    )
+  ) %>%
+  ungroup()
+
+events_data <- left_join(events_data, merge_data) %>%
+  mutate(
+    brand = brand_new,
+    category_id = category_id_new,
+    category_code = category_code_new
+  ) %>%
+  select(-ends_with("new"), -brands, -cat_ids, -cat_codes)
+
+events_data %>%
+  filter(product_id %in% dup_ids) %>%
+  arrange(product_id) %>%
+  distinct(product_id, category_code, category_id, brand, .keep_all = T) %>%
+  print(n = 100)
+```
+
+### Check Top Brands and Categories
+
+```{r}
+events_data %>%
+  janitor::tabyl(brand) %>%
+  as_tibble() %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 20) %>%
+  kable(caption = "Top Brands")
+
+events_data %>%
+  janitor::tabyl(category_code) %>%
+  as_tibble() %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 20) %>%
+  kable(caption = "Top Category Codes")
+
+events_data %>%
+  janitor::tabyl(category_id) %>%
+  as_tibble() %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 20) %>%
+  kable(caption = "Top Category Ids")
+```
+
+For top brands , find their top categories
+
+```{r}
+top_brands <- events_data %>%
+  count(brand) %>%
+  arrange(desc(n)) %>%
+  select(brand)
+
+brand_cat_data <- events_data %>%
+  count(brand, category_code) %>%
+  arrange(desc(n)) %>%
+  left_join(x = top_brands) %>%
+  group_by(brand) %>%
+  left_join(x = top_brands)
+
+events_data %>%
+  count(brand, category_code) %>%
+  arrange(desc(n)) %>%
+  left_join(x = top_brands) %>%
+  group_by(brand) %>%
+  slice_max(order_by = n, n = 3) %>%
+  left_join(x = top_brands) %>%
+  print(n = 100)
+```
+
+We see a pattern here , All brands with SMARTPHONE as their second best category all have construction.tools.light as their top categories
+
+We know Brands like Samsung , Apple , Huawei , e.t.c all specialize in smartphone , so construction.tools.light is wrong . We should replace it with smartphones . But we do this for brands that have smartphones as their second best category .
+
+```{r}
+events_data %>%
+  count(brand, category_code) %>%
+  arrange(desc(n)) %>%
+  left_join(x = top_brands) %>%
+  group_by(brand) %>%
+  slice_max(order_by = n, n = 3) %>%
+  left_join(x = top_brands) %>%
+  group_by(brand) %>%
+  mutate(cats = list(category_code)) %>%
+  rowwise() %>%
+  mutate(
+    cats = na.omit(cats) %>% list(),
+    category_code_new = ifelse(
+      cats[1] == "construction.tools.light" &
+        cats[2] == "electronics.smartphone" &
+        category_code == "construction.tools.light" &
+        length(cats) > 1,
+      cats[2],
+      category_code
+    )
+  ) %>%
+  select(-n, -cats) %>%
+  print(n = 100)
+```
+
+Here we see that our fix will work as intended .
+
+```{r}
+brand_merge <- brand_cat_data %>%
+  group_by(brand) %>%
+  mutate(cats = list(category_code)) %>%
+  rowwise() %>%
+  mutate(
+    cats = na.omit(cats) %>% list(),
+    category_code_new = ifelse(
+      cats[1] == "construction.tools.light" &
+        cats[2] == "electronics.smartphone" &
+        category_code == "construction.tools.light" &
+        length(cats) > 1,
+      cats[2],
+      category_code
+    )
+  ) %>%
+  select(-n, -cats)
+
+events_data <- events_data %>%
+  left_join(y = brand_merge)
+```
+
+```{r}
+length(events_data %>% pull(category_code) %>% na.omit())
+length(events_data %>% pull(category_code_new) %>% na.omit())
+```
+
+Solutions seems to have worked just fine .
+
+```{r}
+events_data <- events_data %>%
+  mutate(category_code = category_code_new) %>%
+  select(-ends_with("new"))
+```
+
+```{r}
+events_data %>%
+  count(brand, category_code) %>%
+  arrange(desc(n)) %>%
+  left_join(x = top_brands) %>%
+  na.omit() %>%
+  print(n = 100)
+```
+
+The category codes of top brand look fine , there are no suspicious categories that need to be investigated .
+
+```{r}
+events_data %>%
+  count(brand, category_code, category_id) %>%
+  arrange(desc(n)) %>%
+  left_join(x = top_brands) %>%
+  na.omit() %>%
+  print(n = 100)
+```
+
+Here , we see that there a unique brand and category combinations with multiple category id .
+
+Now that brands and categories are investigated , lets fix the issue where same product has multiple categories and brands
+
+-   Lets assign top categories and brands to products products with multiple brand and categories , because ideally we should have one category and brand per product .
+
+### Brands
+
+Each product should be associated with one brand , category and category ID
+
+```{r}
+dup_data <- events_data %>%
+  group_by(product_id) %>%
+  summarise(
+    n_brands = n_distinct(brand),
+    n_cat_id = n_distinct(category_id),
+    n_cat_code = n_distinct(category_code)
+  )
+
+dup_ids <- dup_data %>%
+  filter(n_brands > 1 | n_cat_id > 1 | n_cat_code > 1) %>%
+  pull(product_id)
+
+events_data %>%
+  filter(product_id %in% dup_ids) %>%
+  arrange(product_id) %>%
+  distinct(product_id, brand, category_code, category_id, .keep_all = T) %>%
+  select(product_id, brand, category_code, category_id)
+```
+
+Here we see that product ids have multiple brands , category code and IDS , lets fix this by assigning the most common values to these product IDs
+
+```{r}
+merge <- events_data %>%
+  count(product_id, brand, category_code, category_id) %>%
+  arrange(desc(n)) %>%
+  filter(!is.na(product_id)) %>%
+  group_by(product_id) %>%
+  slice_head(n = 1) %>%
+  rename(
+    "brand_new" = brand,
+    "category_code_new" = category_code,
+    "category_id_new" = category_id
+  ) %>%
+  arrange(desc(n))
+
+events_data <- left_join(events_data, merge) %>%
+  mutate(
+    brand = brand_new,
+    category_code = category_code_new,
+    category_id = category_id_new
+  ) %>%
+  select(-ends_with("new"), -n)
+
+events_data %>%
+  filter(product_id %in% dup_ids) %>%
+  arrange(product_id) %>%
+  distinct(product_id, brand, category_code, category_id, .keep_all = T) %>%
+  select(product_id, brand, category_code, category_id)
+
+events_data %>%
+  group_by(product_id) %>%
+  summarise(
+    n_brands = n_distinct(brand),
+    n_cat_id = n_distinct(category_id),
+    n_cat_code = n_distinct(category_code)
+  ) %>%
+  filter(n_brands > 1 | n_cat_id > 1 | n_cat_code > 1)
+```
+
+Now we see that the product IDs now have one brand , category code and id assigned to them .
+
+### Category Code and ID
+
+In online store databases , category code should be assigned to only one category ID .
+
+```{r}
+cat_data <- events_data %>%
+  count(category_code, category_id) %>%
+  arrange(category_code, desc(n))
+cat_data
+
+merge <- cat_data %>%
+  group_by(category_code) %>%
+  slice_head(n = 1) %>%
+  ungroup() %>%
+  rename("category_id_new" = category_id)
+merge
+
+cat_data <- cat_data %>%
+  left_join(y = merge %>% select(-n)) %>%
+  select(-n)
+cat_data
+```
+
+Now each category_code has one ID assigned to it . Now lets merge this with event data in order to fix category codes having multiple category ids issue .
+
+```{r}
+events_data %>%
+  count(category_code, category_id) %>%
+  arrange(category_code, desc(n))
+
+events_data %>%
+  left_join(y = cat_data) %>%
+  count(category_code, category_id_new) %>%
+  arrange(category_code, desc(n))
+```
+
+Our proposed solution will work as intended
+
+```{r}
+events_data <- events_data %>%
+  left_join(y = cat_data)
+
+events_data %>% select(category_id) %>% na.omit() %>% nrow()
+events_data %>% select(category_id_new) %>% na.omit() %>% nrow()
+```
+
+```{r}
+events_data <- events_data %>%
+  mutate(category_id = category_id_new) %>%
+  select(-ends_with("new"))
+events_data
+```
+
+Verify that each product has one brand , category code and ID .
+
+```{r}
+events_data %>%
+  group_by(product_id) %>%
+  summarise(
+    n_brands = n_distinct(brand),
+    n_cat_id = n_distinct(category_id),
+    n_cat_code = n_distinct(category_code)
+  ) %>%
+  filter(n_brands > 1 | n_cat_id > 1 | n_cat_code > 1)
+```
+
+Now that is our basic data cleaning and data validation done .
+
+## Augment our data
+
+Here we derived extra information from existing columns which we may be useful for us when doing actual analysis . Or we find data to add to current data that we think will be helpful to us when doing our analysis .
+
+::: callout-note
+Ideas :
+
+-   Finding date , day of week , hour of day and Time without date of our event time column .\
+-   Category code values are written in such a way that we can break them down into multiple categories .
+
+These info may be useful for us when doing the actual analyses , in this case the second idea will definitely be useful for us .
+:::
+
+### Event time
+
+```{r}
+events_data <- events_data %>%
+  mutate(
+    event_hour = hour(event_time),
+    event_day = wday(event_time, label = T, abbr = F),
+    event_time_hms = format(event_time, "%H:%M:%S")
+  )
+
+events_data
+```
+
+### Category Code
+
+```{r}
+# events_data <- events_data %>%
+#   rowwise() %>%
+#   mutate(cat_splits = str_split(category_code, "\\.")) %>%
+#   ungroup() %>%
+#   mutate(length_split = length(cat_splits))
+```
+
+::: {.callout-note}
+
+The above code is example of bad code . We applying str_split() to all records in our data . Meaning it will be applied to all 7m+ records , we will be computationally intensive . 
+
+The smart of way of doing things here is first extracting all unique category codes , then applying str_split() to the subset then merging the results back into the full dataset . 
+
+:::
+
+
+```{r}
+cat_code_data <- events_data %>% 
+  distinct(category_code) %>%
+  na.omit() %>%
+  rowwise() %>%
+  mutate(cat_split = str_split(category_code, "\\."),
+  length_split = length(cat_split))
+```
+
+```{r}
+cat_code_data <- cat_code_data %>%
+  ungroup() %>%
+  separate(col = category_code , 
+  into = paste0("cat_code_",1:max(cat_code_data$length_split)),
+  sep = "\\.",
+  remove = F) %>%
+  select(-contains("split"))
+
+cat_code_data 
+```
+
+Now we merge the above with our data . 
+
+
+```{r}
+events_data <- events_data %>%
+  left_join(y=cat_code_data)
+
+events_data
+```
+
+That is our basic data cleaning done . 
+
+
+## Save the data 
+
+::: {.callout-note}
+
+For large datasets like this , it often not advised to save the data as a .csv . 
+There are other useful format designed for large data . Example of this is the .parquet format . This format compresses the data , also saves the data types of each column , so when we load the data again in the future we dont start by converting data to correct formats first . 
+
+Popular r package for this format is {arrow} r package . It also allows us to use tidyverse / dplyr syntax when we read in the data .
+
+Use arrow::read_parquet() to read in our .parquet data . 
+Use arrow::write_parquet() to save the data in .parquet format .
+
+:::
+
+
+```{r}
+write_parquet(events_data , 
+"data/events_data_model.gz.parquet",
+compression = "gzip", 
+compression_level = 5)
 ```
 
 
-### Check the number of events distribution
-```{r}
-event_data %>%
-    group_by(event_date) %>%
-    summarise(n = n()) %>%
-    ggplot(aes(x = event_date, y = n, fill = n)) +
-    geom_col(show.legend = F) +
-    labs(title = "Distribution of events per day", x = "Event Date", y = "") +
-    scale_y_continuous(n.breaks = 10, labels = scales::label_number(scale = 0.001, suffix = "K")) +
-    theme_excel_new()
-```
-
--   Events are the lowest at the start of november , maybe be the time when the start-up launched . 
--   Events are the highest mid-november , maybe an event was held around this time . 
--   Then after we see a steady rise in events overtime , maybe correspond to normal business growth . 
-
-Enquire about these to figure out what was happening around these times . 
-Remember we need to adjust for any artificial boosting of events/sales because these can bias products that were advertised as part of boosting campaigns 
-
-
-## Price 
-
-### Distribution of prices 
-```{r}
-event_data %>%
-    select(product_id, price) %>%
-    distinct() %>%
-    ungroup() %>%
-    select(price) %>%
-    unique() %>%
-    ggplot(aes(x = price)) +
-    geom_histogram() +
-    labs(title = "Distribution of product prices", y = "Number of products", x = "Price") +
-    scale_x_continuous(n.breaks = 15, labels = scales::label_currency()) +
-    theme_excel_new()
-```
-
--   We have a price range of $0 - $2600 and most products are prices below $600 . 
-
-### Investigate low and high priced products 
 
 ```{r}
-event_data %>%
-    select(-contains("event"), -contains("user")) %>%
-    distinct(product_id, .keep_all = T) %>%
-    filter(price < 50)
 
-event_data %>%
-    select(-contains("event"), -contains("user")) %>%
-    distinct() %>%
-    filter(price < 2000)
 ```
