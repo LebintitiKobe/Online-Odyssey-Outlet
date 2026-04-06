@@ -1,6 +1,7 @@
 data/december.csv.gz
 data/november.csv.gz
-
+data/events_data_model.parquet
+data/events_data_model.gz.parquet
 .Rproj.user
 .Rhistory
 .RData
