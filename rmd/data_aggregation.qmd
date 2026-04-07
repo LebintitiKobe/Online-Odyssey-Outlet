@@ -1,0 +1,246 @@
+---
+title: "Online Odyssey Outlet - Data Modelling Script"
+author: "Lebintiti Kobe"
+format:
+    gfm:
+        toc: true
+        toc-depth: 2
+        code-annotations: true
+        number-sections: false
+
+execute:
+  error: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+# Problem Statement
+
+> You are a junior analyst working for an e-commerce startup, Online Odyssey Outlet.
+>
+> The date is January 2020, and the startup has just been through its first winter sale. Senior stakeholders are interested in knowing which products performed best during the Christmas period so that they can streamline the products they advertise in future sale periods.
+
+------------------------------------------------------------------------
+
+> You will do this by analyzing up to two months of events data, presented as two separate data sources with identical structures. Events refer not just to sales but to more general customer actions, such as viewing a product on the website or placing it into their virtual cart.
+
+------------------------------------------------------------------------
+
+> The challenge is that, when pressed, stakeholders aren’t exactly sure what they mean by “best.” In an initial brainstorming session, they highlight some aspects they care about when ranking their products:
+>
+> -   Volume of sales
+> -   Total revenue from a single product
+> -   Popularity, measured by the number of unique customers who bought a product
+> -   Conversion, meaning the percentage of time a product is bought once it has been placed in the virtual shopping cart
+> -   Products with increased performance from November to December
+
+# Results driven approach
+
+## 1. Understanding the problem :
+
+Senior stakeholders are interested in knowing which products performed best during the Christmas period so that they can streamline the products they advertise in future sale periods.
+
+### What are our hoping stakeholders to achieve if they advertise the best performing products :
+
+-   To attract and retain new customers
+-   To improve sales
+-   To increase revenue
+-   To increase brand awareness and presence
+-   e.t.c
+
+### "Product" ? :
+
+What do we mean by product ? :
+
+-   Here product can mean an individual product , product brands , product categories , e.t.c . Choose any level of granularity .
+
+### Therefore "best performing product over christmas period" ? :
+
+-   Product that had an increase appeal over christmas period (Conversion rates)
+-   Product that attracted most customers over christmas period (Number of unique customers)
+-   Product that retained most customers over christmas period (Repeat sales maybe)
+-   Product with most increased revenue and sales over christmas period (Revenue and Volume)
+-   e.t.c
+
+### Implications of different metrics
+
+**"Units Sold / Volume" :**
+
+-   a product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c
+-   So to use Volume we need to remove these NOISE and BIASED products
+
+**"Conversion Rates" :**
+
+-   A product can have a high conversion , but lowest units sold ... meaning these product are unreliable , NOISE , we should cut these noise if we using this metric . Also issues with UNITS SOLD Carry over to this metric too .
+
+**"Profits" :**
+
+-   Two products can have the same total profit but different costs , therefore we should couple this with profit margin (%) , high margin implies low cost and high profit ... meaning we should filter out products with high profit but low margins , they are NOISE in this case .
+
+Here my instinct is to use number of units sold to find the best performing products , but lets think of implications of this metric , assess and think of ways we can improve it . 
+
+## Assess Volume(Units Sold) A Metric
+
+### Implications
+
+A product can have high volume but only bought by a few customers , have the worst conversion (appeal) , have the worst customer rating / reviews , have lowest profit , e.t.c . So to use Volume we need to remove these NOISE and BIASED products
+
+-   A product with high volume but few unique buyers is bad for advertisement , it will attract only those few customers . Set a threshold for number of unique buyers in order to remove the bias , meaning products we choose will have solid business value .
+
+-   A product with high volume but bad ratings are also bad for bad for business , low ratings mean our customers are unhappy therefore more likely to churn . Set a threshold for product rating to make sure we pick products that will ensure long term business success .
+
+-   A product with high volume , high total profit is actually bad if its margin is low . It will require more inventory space and to outsell itself in order to make significant profit , this product can be unreliable / practical . Set a threshold for profit margin in order to discard these unreliable products
+
+### Systems Thinking assessment
+
+In order for Units sold to work as a metric :
+
+-   Adjust for return , stock-outs , discounts , ratings/reviews \[Done\] , Product appeal .
+
+-   For product appeal , use conversion rates . But a product with high conversion but a few views / sales is bad for business . Set a threshold for units sold .
+
+-   For returns , we subtract product returns volumes from units sold to adjust for returns
+
+-   For stock-outs/ discounts , drop sales records that occurred during discounts / stock-out periods in order to make product comparisons without any biases .
+
+## Final Metrics set
+
+-   Rank our products by Net Units sold , with threshold set for Rating/Reviews , Number of unique buyers , profit margin and excluding records during product stock-outs and discounts periods .
+
+
+## Data Limitations 
+
+Our data is limited . There is no info on returns , ratings/reviews and for now we got no information on sales periods .
+
+Metrics we will be able to calculate from our data : 
+
+Units Solds = number of product purchase events for each month 
+Number of unique buyers = number of unique customers ids for product purchase events 
+Revenue = sum of prices for product purchase events
+Conversion rates = number of cart events over number of purchase events for each month . 
+
+For units sold to work , we need to set a threshold for number of unique buyers , a threshold for conversion rates . Revenue in this case is not that useful , we needed profit and cost metrics which we do not have for now . 
+
+That is about it . We want growth rates from november to december for these metrics . 
+
+Our final results or minimum viable answer will be a table of Products / Product brands / Categories rank by our growth rates of Units sold , with all necessary adjustments , from November to December .
+
+
+# Aggregate our data into useful format 
+
+## What format / schema should our data be in 
+
+Our main metric here should be 
+
+ ## Load the data 
+
+ ```{r}
+ require(arrow)
+ require(tidyverse)
+ require(kableExtra)
+ require(here)
+
+ events_data <- read_parquet(here("data/events_data_model.gz.parquet"))
+
+ aggregate_data <- events_data %>%
+    group_by(product_id , event_month) %>%
+    summarise(
+    number_cart = sum(event_type == "cart"),
+    number_purchase = sum(event_type == "purchase"),
+    conversion_rate = number_purchase / number_cart ,
+    number_units_sold = number_purchase) %>%
+    ungroup() %>%  
+    select(-number_cart , -number_purchase) 
+
+  merge <- events_data %>%
+    group_by(product_id , event_month) %>%
+    filter(event_type == "purchase") %>%
+    summarise(number_unique_customers = n_distinct(user_id))
+
+  
+  aggregate_data <- aggregate_data %>%
+  left_join(y=merge)
+
+  rm(events_data)
+  rm(merge)
+  gc()  
+
+
+  aggregate_data 
+
+  aggregate_data <- aggregate_data %>% na.omit() %>% filter(conversion_rate < 1)
+ ```
+
+
+ ```{r}
+ dec_data <- aggregate_data %>%
+  filter(event_month == "December") %>%
+  select(-event_month)
+
+dec_avgs <- dec_data %>%
+  filter(conversion_rate < 1) %>%
+  summarise(mean_unq = mean(number_unique_customers),
+  mean_units = mean(number_units_sold),
+  mean_conv = mean(conversion_rate))
+
+dec_data <- dec_data %>%
+  filter(conversion_rate > dec_avgs$mean_conv , 
+  number_units_sold > dec_avgs$mean_units,
+  number_unique_customers > dec_avgs$mean_unq)
+
+nov_data <- aggregate_data %>%
+  filter(event_month == "November")%>%
+  select(-event_month)
+
+nov_avgs <- nov_data %>%
+  filter(conversion_rate < 1) %>%
+  summarise(mean_unq = mean(number_unique_customers),
+  mean_units = mean(number_units_sold),
+  mean_conv = mean(conversion_rate))  
+
+nov_data <- nov_data %>%
+  filter(conversion_rate > nov_avgs$mean_conv , 
+  number_units_sold > nov_avgs$mean_units,
+  number_unique_customers > nov_avgs$mean_unq)
+
+ ```
+
+
+
+```{r}
+nov_data <- nov_data %>%
+  rename_with(.cols = ,~paste0("nov_",.x))%>%
+  rename("product_id" = nov_product_id) 
+
+dec_data <- dec_data %>%
+  rename_with(.cols = ,~paste0("dec_",.x))%>%
+  rename("product_id" = dec_product_id) 
+
+
+aggregate_data <- nov_data %>%
+  full_join(y=dec_data)
+```
+
+
+
+```{r}
+aggregate_data <- aggregate_data %>%
+  mutate(conv_growth_rate = ((dec_conversion_rate-nov_conversion_rate)/nov_conversion_rate)*100,
+  unit_growth_rate = ((dec_number_units_sold-nov_number_units_sold)/nov_number_units_sold)*100,
+  unq_cust_growth_rate = ((dec_number_unique_customers-nov_number_unique_customers)/nov_number_unique_customers)*100)
+
+
+growth_avgs <- aggregate_data %>%
+  summarise(mean_conv_growth = mean(conv_growth_rate,na.rm = T),
+  mean_unq_cust_growth = mean(unq_cust_growth_rate,na.rm = T),
+  mean_units_growth = mean(unit_growth_rate,na.rm = T))
+
+top_products <- aggregate_data %>%
+  filter(conv_growth_rate > growth_avgs$mean_conv_growth,
+  unit_growth_rate > growth_avgs$mean_units_growth,
+  unq_cust_growth_rate > growth_avgs$mean_unq_cust_growth) %>%
+    arrange(desc(unit_growth_rate),desc(unq_cust_growth_rate))
+
+top_products %>% kable()  
+```

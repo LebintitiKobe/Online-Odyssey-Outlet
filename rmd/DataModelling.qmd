@@ -1,19 +1,19 @@
----
-title: "Online Odyssey Outlet - Data Modelling Script"
-author: "Lebintiti Kobe"
-format:
-    gfm:
-        toc: true
-        toc-depth: 2
-        code-annotations: true
-        number-sections: false
+  ---
+  title: "Online Odyssey Outlet - Data Modelling Script"
+  author: "Lebintiti Kobe"
+  format:
+      gfm:
+          toc: true
+          toc-depth: 2
+          code-annotations: true
+          number-sections: false
 
-execute:
-  error: false
-  warning: false
-editor_options: 
-  chunk_output_type: console
----
+  execute:
+    error: false
+    warning: false
+  editor_options: 
+    chunk_output_type: console
+  ---
 
 # Load Libraries
 
@@ -25,6 +25,8 @@ require(skimr)
 require(ggthemes)
 require(kableExtra)
 require(arrow)
+
+gc()
 ```
 
 # Load Data
@@ -39,6 +41,10 @@ Merge november and december data since the have the same data schema then view t
 ```{r}
 events_data <- bind_rows(nov_data, dec_data) %>%
   janitor::clean_names()
+
+rm(nov_data)
+rm(dec_data)
+gc()
 ```
 
 ## Clean up character data
@@ -227,6 +233,9 @@ events_data %>%
 ```{r}
 events_data <- events_data %>%
   filter(!product_id %in% zero_price_ids)
+
+rm(zero_price_ids)
+gc()
 ```
 
 ### Investigate high priced products
@@ -419,6 +428,10 @@ brand_merge <- brand_cat_data %>%
 
 events_data <- events_data %>%
   left_join(y = brand_merge)
+
+rm(merge_data)
+rm(dup_data)
+rm(dup_ids)
 ```
 
 ```{r}
@@ -441,6 +454,7 @@ events_data %>%
   left_join(x = top_brands) %>%
   na.omit() %>%
   print(n = 100)
+
 ```
 
 The category codes of top brand look fine , there are no suspicious categories that need to be investigated .
@@ -570,6 +584,12 @@ events_data <- events_data %>%
 
 events_data %>% select(category_id) %>% na.omit() %>% nrow()
 events_data %>% select(category_id_new) %>% na.omit() %>% nrow()
+
+rm(cat_data)
+rm(merge)
+rm(dup_data)
+rm(dup_ids)
+gc()
 ```
 
 ```{r}
@@ -614,7 +634,8 @@ events_data <- events_data %>%
   mutate(
     event_hour = hour(event_time),
     event_day = wday(event_time, label = T, abbr = F),
-    event_time_hms = format(event_time, "%H:%M:%S")
+    event_time_hms = format(event_time, "%H:%M:%S"),
+    event_month = month(event_time , label = T , abbr = F)
   )
 
 events_data
@@ -668,6 +689,9 @@ events_data <- events_data %>%
   left_join(y=cat_code_data)
 
 events_data
+
+rm(cat_code_data)
+gc()
 ```
 
 That is our basic data cleaning done . 
