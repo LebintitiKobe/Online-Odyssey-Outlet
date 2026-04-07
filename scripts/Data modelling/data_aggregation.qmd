@@ -167,7 +167,7 @@ Our main metric here should be
   gc()  
 
 
-  aggregate_data 
+  aggregate_data %>% head(n=50) %>% kable()
 
   aggregate_data <- aggregate_data %>% na.omit() %>% filter(conversion_rate < 1)
 ```
@@ -218,7 +218,6 @@ dec_data <- dec_data %>%
   rename_with(.cols = ,~paste0("dec_",.x))%>%
   rename("product_id" = dec_product_id) 
 
-
 aggregate_data <- nov_data %>%
   full_join(y=dec_data)
 ```
@@ -242,7 +241,8 @@ top_products <- aggregate_data %>%
   unit_growth_rate > growth_avgs$mean_units_growth ,
   unq_cust_growth_rate > growth_avgs$mean_unq_cust_growth) %>%
     arrange(desc(unit_growth_rate),desc(unq_cust_growth_rate))
-top_products
+
+top_products %>% head(n=50) %>% kable()
 
 best_prod_id <- top_products %>% pull(product_id)
 
