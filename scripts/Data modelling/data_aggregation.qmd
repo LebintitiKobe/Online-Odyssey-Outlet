@@ -2,7 +2,7 @@
 title: "Online Odyssey Outlet - Data Modelling Script"
 author: "Lebintiti Kobe"
 format:
-    pdf:
+    gfm:
         toc: true
         toc-depth: 2
         code-annotations: true
@@ -96,7 +96,7 @@ A product can have high volume but only bought by a few customers , have the wor
 
 In order for Units sold to work as a metric :
 
--   Adjust for return , stock-outs , discounts , ratings/reviews \[Done\] , Product appeal .
+-   Adjust for return , stock-outs , discounts , ratings/reviews , Product appeal .
 
 -   For product appeal , use conversion rates . But a product with high conversion but a few views / sales is bad for business . Set a threshold for units sold .
 
@@ -133,9 +133,9 @@ Our final results or minimum viable answer will be a table of Products / Product
 
 Our main metric here should be 
 
- ## Load the data 
+## Load the data 
 
- ```{r}
+```{r}
  require(arrow)
  require(tidyverse)
  require(kableExtra)
@@ -170,10 +170,11 @@ Our main metric here should be
   aggregate_data 
 
   aggregate_data <- aggregate_data %>% na.omit() %>% filter(conversion_rate < 1)
- ```
+```
 
 
- ```{r}
+
+```{r}
  dec_data <- aggregate_data %>%
   filter(event_month == "December") %>%
   select(-event_month)
@@ -204,7 +205,7 @@ nov_data <- nov_data %>%
   number_units_sold > nov_avgs$mean_units,
   number_unique_customers > nov_avgs$mean_unq)
 
- ```
+```
 
 
 
@@ -293,7 +294,7 @@ But no worries since this is just our minumum viable solution . We will iterate 
 
 
 ```{r}
-write_csv(top_products , "data/best_products.csv")
+# write_csv(x = top_products , file = "data/top_products.csv")
 ```
 
 
