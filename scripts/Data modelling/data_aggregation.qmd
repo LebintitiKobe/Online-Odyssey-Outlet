@@ -2,7 +2,7 @@
 title: "Online Odyssey Outlet - Data Modelling Script"
 author: "Lebintiti Kobe"
 format:
-    gfm:
+    pdf:
         toc: true
         toc-depth: 2
         code-annotations: true
@@ -140,6 +140,7 @@ Our main metric here should be
  require(tidyverse)
  require(kableExtra)
  require(here)
+ require(janitor)
 
  events_data <- read_parquet(here("data/events_data_model.gz.parquet"))
 
@@ -162,7 +163,6 @@ Our main metric here should be
   aggregate_data <- aggregate_data %>%
   left_join(y=merge)
 
-  rm(events_data)
   rm(merge)
   gc()  
 
@@ -238,9 +238,65 @@ growth_avgs <- aggregate_data %>%
 
 top_products <- aggregate_data %>%
   filter(conv_growth_rate > growth_avgs$mean_conv_growth,
-  unit_growth_rate > growth_avgs$mean_units_growth,
+  unit_growth_rate > growth_avgs$mean_units_growth ,
   unq_cust_growth_rate > growth_avgs$mean_unq_cust_growth) %>%
     arrange(desc(unit_growth_rate),desc(unq_cust_growth_rate))
+top_products
 
-top_products %>% kable()  
+best_prod_id <- top_products %>% pull(product_id)
+
+merge <- events_data %>%
+  filter(product_id %in% best_prod_id) %>%
+  distinct(product_id,.keep_all = T) %>%
+  select(product_id , contains("code") , brand , category_id)
+
+top_products <- top_products %>%
+  left_join(x=merge) %>%
+  select(-cat_code_4)
+
+rm(events_data)
+rm(merge)
+gc()
+```
+
+
+So we have 50+ products with every variable greater than average of each variable for all products . 
+
+But lets further trim these products : 
+
+-  We want products that sold twice as much in december as compared to november , units growth rate of 100% or more. 
+-  We want products that sold more than 50 units in november . 
+-  We want products that had more than 50 unique customers in in november . 
+-  We want products that had twice as much unique customers in december . 
+-  The conversion rates and conversion growths seem fine to me , but we would like products with positive conversion growth , more than 5%. 
+
+
+```{r}
+top_products <- top_products %>%
+  filter(
+  nov_number_units_sold > 50 ,
+  nov_number_unique_customers > 50 ,
+  unit_growth_rate > 100 , 
+  unq_cust_growth_rate > 100,
+  conv_growth_rate > 5) %>%
+    arrange(desc(unit_growth_rate),desc(unq_cust_growth_rate))
+
+top_products %>%
+  kable()
+```
+
+We have a total of 16 products . Then we have two potential errors in our final results . A sport bicycle by JBL do not seem right at all . Then we have one product with NULLs for brand and categories . 
+
+But no worries since this is just our minumum viable solution . We will iterate once we clarified a few things with our stakeholders . 
+
+## Save final results table 
+
+
+```{r}
+write_csv(top_products , "data/best_products.csv")
+```
+
+
+```{r}
+
 ```
