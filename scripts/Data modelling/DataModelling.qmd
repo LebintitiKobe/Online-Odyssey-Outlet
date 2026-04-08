@@ -46,7 +46,7 @@ rm(nov_data)
 rm(dec_data)
 gc(verbose = F)
 
-events_data %>% head(n=50) %>% kable()
+events_data %>% head(n = 50) %>% kable()
 ```
 
 ## Clean up character data
@@ -100,11 +100,10 @@ Products/Brands/Categories :
 
 Of course , there is so much we can validate for online store data , but for now we focus on concepts that can be found in the data we have , nothing more nothing less .
 
-::: callout-note
 In this case if a product has multiple brands , category code and category ID , we assign the most common brand , category code and ID in order to not have multiple values for brand and category columns .
 
 A better way to do things here is to actually assign the most recent brand , category code and ID to products with multiple values in these columns . This makes sense in online store case , so store manager can know which other past values were assign to the most recent , hence use value in those columns .
-:::
+
 
 ## User Columns
 
@@ -164,7 +163,9 @@ events_data <- events_data %>%
 events_data %>%
   group_by(event_date) %>%
   count() %>%
-  filter(n < 1) %>% head(n=50) %>% kable()
+  filter(n < 1) %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 -   No results got returned meaning there is no working date without a record / event , therefore we can be a little extra confident on our data
@@ -196,7 +197,7 @@ Enquire about these to figure out what was happening around these times . Rememb
 ```{r}
 events_data %>%
   select(price) %>%
-  skim() 
+  skim()
 ```
 
 -   We have a price range of \\\$0 - \\\$2600 and most products are prices below \$600 . More than 75% of the prices are below \$400
@@ -223,8 +224,9 @@ events_data %>%
     n_event_type = length(list(unique(event_type))),
     n_brands = length(list(unique(brand)))
   ) %>%
-  filter(n_brands > 1 | n_event_type > 1) %>% 
-  head(n=50) %>% kable()
+  filter(n_brands > 1 | n_event_type > 1) %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 -   We have around 1400 products with prices of zero , all of them do not have brands codes and they dont have any purchase event . These may products that we dropped from the catalog by some brand which was not selling well .
@@ -245,7 +247,9 @@ events_data %>%
   select(-contains("event"), -contains("user")) %>%
   filter(price > 2000) %>%
   janitor::tabyl(category_code) %>%
-  arrange(desc(percent)) %>% head(n=50) %>% kable()
+  arrange(desc(percent)) %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 -   Looking at top categories of high priced items by number of events , the categories listed here are usually high prices , there is nothing too suspicious here .
@@ -270,7 +274,9 @@ dup_ids <- dup_data %>%
 events_data %>%
   filter(product_id %in% dup_ids) %>%
   arrange(product_id) %>%
-  distinct(product_id, category_code, category_id, brand, .keep_all = T) %>% head(n=50) %>% kable()
+  distinct(product_id, category_code, category_id, brand, .keep_all = T) %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 ### If a product has two distinct brands / categories but one is NULL , replace NULL with the other brand / category
@@ -320,7 +326,9 @@ events_data <- left_join(events_data, merge_data) %>%
 events_data %>%
   filter(product_id %in% dup_ids) %>%
   arrange(product_id) %>%
-  distinct(product_id, category_code, category_id, brand, .keep_all = T) %>% head(n=50) %>% kable()
+  distinct(product_id, category_code, category_id, brand, .keep_all = T) %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 ### Check Top Brands and Categories
@@ -345,7 +353,7 @@ events_data %>%
   as_tibble() %>%
   arrange(desc(n)) %>%
   slice_head(n = 20) %>%
-  kable(caption = "Top Category Ids") 
+  kable(caption = "Top Category Ids")
 ```
 
 For top brands , find their top categories
@@ -369,7 +377,9 @@ events_data %>%
   left_join(x = top_brands) %>%
   group_by(brand) %>%
   slice_max(order_by = n, n = 3) %>%
-  left_join(x = top_brands) %>% head(n=50) %>% kable()
+  left_join(x = top_brands) %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 We see a pattern here , All brands with SMARTPHONE as their second best category all have construction.tools.light as their top categories
@@ -398,7 +408,9 @@ events_data %>%
       category_code
     )
   ) %>%
-  select(-n, -cats) %>% head(n=50) %>% kable()
+  select(-n, -cats) %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 Here we see that our fix will work as intended .
@@ -447,8 +459,9 @@ events_data %>%
   count(brand, category_code) %>%
   arrange(desc(n)) %>%
   left_join(x = top_brands) %>%
-  na.omit() %>% head(n=50) %>% kable()
-
+  na.omit() %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 The category codes of top brand look fine , there are no suspicious categories that need to be investigated .
@@ -458,7 +471,9 @@ events_data %>%
   count(brand, category_code, category_id) %>%
   arrange(desc(n)) %>%
   left_join(x = top_brands) %>%
-  na.omit() %>% head(n=50) %>% kable()
+  na.omit() %>%
+  head(n = 50) %>%
+  kable()
 ```
 
 Here , we see that there a unique brand and category combinations with multiple category id .
@@ -488,8 +503,9 @@ events_data %>%
   filter(product_id %in% dup_ids) %>%
   arrange(product_id) %>%
   distinct(product_id, brand, category_code, category_id, .keep_all = T) %>%
-  select(product_id, brand, category_code, category_id) %>% 
-  head(n=20) %>% kable()
+  select(product_id, brand, category_code, category_id) %>%
+  head(n = 20) %>%
+  kable()
 ```
 
 Here we see that product ids have multiple brands , category code and IDS , lets fix this by assigning the most common values to these product IDs
@@ -521,7 +537,7 @@ events_data %>%
   arrange(product_id) %>%
   distinct(product_id, brand, category_code, category_id, .keep_all = T) %>%
   select(product_id, brand, category_code, category_id) %>%
-  head(n=20) %>%
+  head(n = 20) %>%
   kable()
 
 events_data %>%
@@ -545,19 +561,19 @@ In online store databases , category code should be assigned to only one categor
 cat_data <- events_data %>%
   count(category_code, category_id) %>%
   arrange(category_code, desc(n))
-cat_data %>% head(n=20) %>% kable()
+cat_data %>% head(n = 20) %>% kable()
 
 merge <- cat_data %>%
   group_by(category_code) %>%
   slice_head(n = 1) %>%
   ungroup() %>%
   rename("category_id_new" = category_id)
-merge %>% head(n=20) %>% kable()
+merge %>% head(n = 20) %>% kable()
 
 cat_data <- cat_data %>%
   left_join(y = merge %>% select(-n)) %>%
   select(-n)
-cat_data %>% head(n=20) %>% kable()
+cat_data %>% head(n = 20) %>% kable()
 ```
 
 Now each category_code has one ID assigned to it . Now lets merge this with event data in order to fix category codes having multiple category ids issue .
@@ -565,12 +581,16 @@ Now each category_code has one ID assigned to it . Now lets merge this with even
 ```{r}
 events_data %>%
   count(category_code, category_id) %>%
-  arrange(category_code, desc(n)) %>% head(n=20) %>% kable()
+  arrange(category_code, desc(n)) %>%
+  head(n = 20) %>%
+  kable()
 
 events_data %>%
   left_join(y = cat_data) %>%
   count(category_code, category_id_new) %>%
-  arrange(category_code, desc(n)) %>% head(n=20) %>% kable()
+  arrange(category_code, desc(n)) %>%
+  head(n = 20) %>%
+  kable()
 ```
 
 Our proposed solution will work as intended
@@ -593,7 +613,7 @@ gc(verbose = F)
 events_data <- events_data %>%
   mutate(category_id = category_id_new) %>%
   select(-ends_with("new"))
-events_data %>% head(n=20) %>% kable()
+events_data %>% head(n = 20) %>% kable()
 ```
 
 Verify that each product has one brand , category code and ID .
@@ -606,8 +626,9 @@ events_data %>%
     n_cat_id = n_distinct(category_id),
     n_cat_code = n_distinct(category_code)
   ) %>%
-  filter(n_brands > 1 | n_cat_id > 1 | n_cat_code > 1) %>% 
-  head(n=20) %>% kable()
+  filter(n_brands > 1 | n_cat_id > 1 | n_cat_code > 1) %>%
+  head(n = 20) %>%
+  kable()
 ```
 
 Now that is our basic data cleaning and data validation done .
@@ -632,10 +653,10 @@ events_data <- events_data %>%
     event_hour = hour(event_time),
     event_day = wday(event_time, label = T, abbr = F),
     event_time_hms = format(event_time, "%H:%M:%S"),
-    event_month = month(event_time , label = T , abbr = F)
+    event_month = month(event_time, label = T, abbr = F)
   )
 
-events_data %>% head(n=20) %>% kable()
+events_data %>% head(n = 20) %>% kable()
 ```
 
 ### Category Code
@@ -655,24 +676,28 @@ The smart of way of doing things here is first extracting all unique category co
 
 
 ```{r}
-cat_code_data <- events_data %>% 
+cat_code_data <- events_data %>%
   distinct(category_code) %>%
   na.omit() %>%
   rowwise() %>%
-  mutate(cat_split = str_split(category_code, "\\."),
-  length_split = length(cat_split))
+  mutate(
+    cat_split = str_split(category_code, "\\."),
+    length_split = length(cat_split)
+  )
 ```
 
 ```{r}
 cat_code_data <- cat_code_data %>%
   ungroup() %>%
-  separate(col = category_code , 
-  into = paste0("cat_code_",1:max(cat_code_data$length_split)),
-  sep = "\\.",
-  remove = F) %>%
+  separate(
+    col = category_code,
+    into = paste0("cat_code_", 1:max(cat_code_data$length_split)),
+    sep = "\\.",
+    remove = F
+  ) %>%
   select(-contains("split"))
 
-cat_code_data %>% head(n=20) %>% kable()
+cat_code_data %>% head(n = 20) %>% kable()
 ```
 
 Now we merge the above with our data . 
@@ -680,9 +705,9 @@ Now we merge the above with our data .
 
 ```{r}
 events_data <- events_data %>%
-  left_join(y=cat_code_data)
+  left_join(y = cat_code_data)
 
-events_data %>% head(n=20) %>% kable()
+events_data %>% head(n = 20) %>% kable()
 
 rm(cat_code_data)
 gc(verbose = F)
@@ -704,9 +729,9 @@ Use arrow::write_parquet() to save the data in .parquet format .
 
 
 ```{r}
-# write_parquet(events_data , 
+# write_parquet(events_data ,
 # "data/events_data_model.gz.parquet",
-# compression = "gzip", 
+# compression = "gzip",
 # compression_level = 5)
 ```
 

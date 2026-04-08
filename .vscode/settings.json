@@ -1,0 +1,9 @@
+{
+    "editor.defaultFormatter": "quarto.quarto",
+    "notebook.defaultFormatter": "quarto.quarto",
+    "notebook.formatOnCellExecution": true,
+    "notebook.formatOnSave.enabled": true,
+    "editor.formatOnType": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+}
