@@ -221,7 +221,7 @@ best_products <- best_products %>%
     across(is.character, ~ str_replace_all(., "\\.", " ") %>% str_to_title())
   ) %>%
   mutate(across(contains("growth_rate"), ~ scales::percent(., scale = 1))) %>%
-  kable(col.names = column_names ,caption = "Top Performing Products")
+  kable(col.names = column_names, caption = "Top Performing Products")
 
 best_products
 ```
@@ -270,6 +270,7 @@ Our data is limited . There is no information on returns , ratings/reviews and o
 
   ------------------------------------------------------------------------
 
+ 
 2.  **Solutions to product with multiple brand and categories , category codes with multiple category IDs**
 
 - ***Instead of just replacing product multiple brands and categories with the most common ones , we could replace them with the most recent one , then also keep a list of other brands / categories associated with the product , for data lineage and trust .***
